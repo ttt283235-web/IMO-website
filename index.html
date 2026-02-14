@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emote Panel</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:white;
+    text-align:center;
+}
+
+.container{
+    padding:15px;
+}
+
+input{
+    width:90%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+    border:none;
+    font-size:16px;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    background:#00ff99;
+    font-size:16px;
+    margin:5px;
+}
+
+#emoteList{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-top:15px;
+}
+
+.emote-box{
+    background:#222;
+    padding:5px;
+    border-radius:10px;
+}
+
+.emote-box img{
+    width:100%;
+    border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loginPage" class="container">
+    <h2>Welcome Ravi 🔥</h2>
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+
+    <br><br>
+    <button onclick="window.open('https://youtube.com')">YouTube</button>
+    <button onclick="window.open('https://telegram.org')">Telegram</button>
+    <button onclick="window.open('https://wa.me/')">WhatsApp</button>
+</div>
+
+<div id="mainPage" class="container" style="display:none;">
+
+    <input type="text" id="teamCode" placeholder="Enter Team Code">
+    <input type="text" id="uid" placeholder="Enter UID">
+    <input type="text" id="emoteId" placeholder="Enter Emote ID (Optional)">
+    <button onclick="sendEmote()">Send Emote</button>
+
+    <input type="text" id="searchBox" placeholder="Search Emote ID" onkeyup="searchEmote()">
+
+    <div id="emoteList"></div>
+
+</div>
+
+<script>
+
+const API_BASE = "http://127.0.0.1:10000/join?tc=";
+
+// 🔥 Login
+function login(){
+    let pass = document.getElementById("password").value;
+    if(pass === "123"){
+        document.getElementById("loginPage").style.display="none";
+        document.getElementById("mainPage").style.display="block";
+        loadEmotes();
+    }else{
+        alert("Wrong Password");
+    }
+}
+
+// 🔥 Send Emote Manually
+function sendEmote(){
+    let tc = document.getElementById("teamCode").value;
+    let uid = document.getElementById("uid").value;
+    let emote = document.getElementById("emoteId").value;
+
+    if(!tc || !uid || !emote){
+        alert("Fill all fields!");
+        return;
+    }
+
+    let finalURL = API_BASE + tc + "&uid1=" + uid + "&emote_id=" + emote;
+
+    fetch(finalURL)
+    .then(res=>alert("Emote Sent"))
+    .catch(err=>alert("API Error"));
+}
+
+// 🔥 Load Emotes Auto (909000001 format)
+function loadEmotes(){
+    let container = document.getElementById("emoteList");
+    container.innerHTML="";
+
+    // Change 395 to your total emote count
+    for(let i=1;i<=395;i++){
+
+        let id = "9090" + String(i).padStart(5,'0');
+
+        container.innerHTML += `
+        <div class="emote-box" onclick="selectEmote('${id}')">
+            <img src="emotes/${id}.png" onerror="this.style.display='none'">
+        </div>`;
+    }
+}
+
+// 🔥 Click Emote → Direct API Call
+function selectEmote(id){
+    let tc = document.getElementById("teamCode").value;
+    let uid = document.getElementById("uid").value;
+
+    if(!tc || !uid){
+        alert("Enter Team Code & UID first");
+        return;
+    }
+
+    let finalURL = API_BASE + tc + "&uid1=" + uid + "&emote_id=" + id;
+
+    fetch(finalURL)
+    .then(res=>alert("Emote Sent"))
+    .catch(err=>alert("API Error"));
+}
+
+// 🔥 Search Function
+function searchEmote(){
+    let value = document.getElementById("searchBox").value.toLowerCase();
+    let boxes = document.querySelectorAll(".emote-box");
+
+    boxes.forEach(box=>{
+        let img = box.querySelector("img").src;
+
+        if(img.includes(value)){
+            box.style.display="block";
+        }else{
+            box.style.display="none";
+        }
+    });
+}
+
+</script>
+
+</body>
+</html>
